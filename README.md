@@ -1,23 +1,35 @@
-1.本项目是Spark“数字人体”AI挑战赛——脊柱疾病智能诊断大赛的baseline  
-2.本项目依赖于nn_tools，可以在github本人（wolaituodiban）项目中中自行搜索下载  
-3.文件结构  
---code  
-&nbsp;|--core  
-&nbsp;|--disease        症状分类相关代码（因为是baseline，椎间盘默认预测v1，锥体默认预测v2)  
-&nbsp;|--key_point      定位相关代码  
-&nbsp;|--static_files   定义输出格式的静态文件  
-&nbsp;|--structure      封装了DICOM的类，包含基础的自动寻找T2序列和中间帧的功能，拓展了一些简单空间几何变换函数  
-&nbsp;|--data_utils.py  数据处理的常用函数  
-&nbsp;|--dicom_utils.py 读取dicom文件的常用函数  
-&nbsp;|--visiliation.py 简单的可视化函数  
-&nbsp;|--main.py            入口，请在项目根目录下运行python -m code.main  
---data  
-&nbsp;|--lumbar_train150    训练集  
-&nbsp;|--train              校验集  
-&nbsp;|--lumbar_testA50     A榜测试集  
---models                  存放模型文件的目录  
---predictions             存放预测结果的目录  
---requirements.txt        项目的依赖，请自行安装      
-4.提交的baseline分数在0.3274左右  
+# Guide to run distributed training with BF16 data type
+## Verified on
 
-第一次分享baseline，如果有哪里做的不好，还请多多包含
+| Item | Value |
+| -: | :- |
+| OS | Ubuntu 20.04 LTS |
+| Compiler | gcc 9.3.0 |
+| GNU C Library | GLIBC 2.31
+
+## Prepare your running environment
+We recommend you to use Anaconda to prepare the enviroments
+
+1. Build and install PyTorch
+```
+  conda install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests
+  # Add LAPACK support for the GPU if needed
+  conda install -c pytorch magma-cuda102  # or [ magma-cuda101 | magma-cuda100 | magma-cuda92 ] depending on your cuda version
+  git clone https://github.com/GavinGu07/pytorch.git
+  cd pytorch
+  git checkout tianchi-bf16
+  export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
+  python setup.py install
+```
+2. Build and install Torchvision
+```
+  git clone https://github.com/GavinGu07/vision.git
+  cd vision
+  git checkout tianchi-bf16
+  python setup.py install
+```
+
+## Training with BF16
+```
+  bash run.sh
+```
